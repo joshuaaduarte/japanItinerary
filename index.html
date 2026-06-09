@@ -193,6 +193,14 @@
       padding-top: 34px;
     }
 
+    .page {
+      display: none;
+    }
+
+    .page.active-page {
+      display: block;
+    }
+
     .section-head {
       display: flex;
       align-items: end;
@@ -495,6 +503,29 @@
       display: block;
     }
 
+    .choice-strip {
+      display: none;
+      margin: 12px 0 0;
+      padding: 10px;
+      border-radius: 7px;
+      background: #eef3f6;
+      border: 1px solid #c9d9df;
+      color: #365767;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .choice-strip.visible {
+      display: block;
+    }
+
+    .option-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     .timeline {
       display: grid;
       gap: 12px;
@@ -564,6 +595,12 @@
       font-size: 13px;
       line-height: 1.35;
       color: var(--muted);
+    }
+
+    .mood.selected {
+      border-color: #9eb9c2;
+      background: #eef3f6;
+      box-shadow: inset 0 0 0 1px #c9d9df;
     }
 
     .details {
@@ -740,7 +777,7 @@
       <h1>Japan Honeymoon</h1>
       <p class="hero-copy">A phone-friendly itinerary for Joshua and Ana: romantic where it matters, flexible when energy dips, and practical enough to actually use day by day.</p>
       <div class="hero-actions">
-        <a class="btn primary" href="#days">View itinerary</a>
+        <a class="btn primary" href="#itinerary">View itinerary</a>
         <a class="btn" href="https://docs.google.com/spreadsheets/d/1xYQKh_aeZ3kbX54FZfoASS1mDeR_zRAHtVYp9b5cJ78/edit" target="_blank" rel="noreferrer">Open sheet</a>
       </div>
     </div>
@@ -748,18 +785,18 @@
 
   <main class="shell">
     <nav class="nav" aria-label="Itinerary sections">
-      <button class="active" data-target="overview">Overview</button>
-      <button data-target="days">Itinerary</button>
-      <button data-target="day-options">Day Options</button>
-      <button data-target="hotels">Hotels</button>
-      <button data-target="food">Food</button>
-      <button data-target="experiences">Experiences</button>
-      <button data-target="prep">To Do</button>
-      <button data-target="budget">Budget</button>
-      <button data-target="links">Links</button>
+      <button class="active" data-page="overview">Overview</button>
+      <button data-page="itinerary">Itinerary</button>
+      <button data-page="options">Options</button>
+      <button data-page="hotels">Hotels</button>
+      <button data-page="food">Food</button>
+      <button data-page="experiences">Experiences</button>
+      <button data-page="prep">To Do</button>
+      <button data-page="budget">Budget</button>
+      <button data-page="links">Links</button>
     </nav>
 
-    <section id="overview">
+    <section class="page active-page" id="overview" data-page-section="overview">
       <div class="section-head">
         <h2>The Shape</h2>
         <p class="section-note">Keep Ana's route, concentrate luxury on the stays that change the trip, and leave each day with a softer version if the honeymoon needs more rest.</p>
@@ -842,7 +879,7 @@
       </section>
     </section>
 
-    <section id="days">
+    <section class="page" id="itinerary" data-page-section="itinerary">
       <div class="section-head">
         <h2>Itinerary</h2>
         <p class="section-note">The clean day-by-day version: where you are, the main plan, food idea, estimated spend, and anything already confirmed.</p>
@@ -850,7 +887,7 @@
       <div class="timeline" id="dayList"></div>
     </section>
 
-    <section id="day-options">
+    <section class="page" id="options" data-page-section="options">
       <div class="section-head">
         <h2>Day Options</h2>
         <p class="section-note">Use this when you want to decide based on energy. The main itinerary stays calm, and the flexible choices live here.</p>
@@ -858,7 +895,7 @@
       <div class="timeline" id="dayOptionsList"></div>
     </section>
 
-    <section id="hotels">
+    <section class="page" id="hotels" data-page-section="hotels">
       <div class="section-head">
         <h2>Hotels</h2>
         <p class="section-note">The sweet spot is city-value nights plus a few intentional honeymoon rooms. Rough rates are placeholders until live booking pages are checked.</p>
@@ -866,7 +903,7 @@
       <div class="grid" id="hotelList"></div>
     </section>
 
-    <section id="food">
+    <section class="page" id="food" data-page-section="food">
       <div class="section-head">
         <h2>Food</h2>
         <p class="section-note">The food plan should stay flexible: casual meals most days, one Tokyo splurge, one Kyoto splurge, and a celebratory final Osaka dinner.</p>
@@ -874,7 +911,7 @@
       <div class="grid" id="foodList"></div>
     </section>
 
-    <section id="experiences">
+    <section class="page" id="experiences" data-page-section="experiences">
       <div class="section-head">
         <h2>Experiences</h2>
         <p class="section-note">These are the anchors worth deciding early, especially DisneySea, teamLab, ryokan time, and any spa or final dinner reservation.</p>
@@ -882,7 +919,7 @@
       <div class="grid" id="experienceList"></div>
     </section>
 
-    <section id="prep">
+    <section class="page" id="prep" data-page-section="prep">
       <div class="section-head">
         <h2>Before We Go</h2>
         <p class="section-note">The practical stuff that turns this from a pretty plan into a trip you can actually take. Checked items save locally on this device.</p>
@@ -890,7 +927,7 @@
       <div class="checklist-grid" id="prepList"></div>
     </section>
 
-    <section id="budget">
+    <section class="page" id="budget" data-page-section="budget">
       <div class="section-head">
         <h2>Budget</h2>
         <p class="section-note">Preliminary ranges excluding flights. The biggest swing is how much luxury you want in Hakone, Kyoto, and Osaka.</p>
@@ -900,7 +937,7 @@
       </div>
     </section>
 
-    <section id="links">
+    <section class="page" id="links" data-page-section="links">
       <div class="section-head">
         <h2>Links</h2>
         <p class="section-note">Fast exits to the working sheet, original doc, and the main hotel/research pages.</p>
@@ -1205,7 +1242,7 @@
     ];
 
     const stateKey = "japan-honeymoon-planning-v1";
-    const defaultState = { confirmed: {}, prep: {} };
+    const defaultState = { confirmed: {}, prep: {}, dayChoices: {} };
     const loadState = () => {
       try {
         return { ...defaultState, ...JSON.parse(localStorage.getItem(stateKey) || "{}") };
@@ -1229,6 +1266,21 @@
       return `<div class="confirmed-strip visible" data-day-confirmed="${escapeHtml(dayId)}"><b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" - ")}</div>`;
     };
 
+    const choiceLabel = { low: "Low energy", medium: "Medium", high: "High energy" };
+    const getChoiceText = (day, choice) => {
+      if (choice === "low") return day[4];
+      if (choice === "medium") return day[5];
+      if (choice === "high") return day[6];
+      return "";
+    };
+
+    const renderChoiceStrip = (day) => {
+      const choice = state.dayChoices[day[0]];
+      const text = getChoiceText(day, choice);
+      if (!choice || !text) return `<div class="choice-strip" data-day-choice-summary="${escapeHtml(day[0])}"></div>`;
+      return `<div class="choice-strip visible" data-day-choice-summary="${escapeHtml(day[0])}"><b>Selected option:</b> ${escapeHtml(choiceLabel[choice])} - ${escapeHtml(text)}</div>`;
+    };
+
     document.getElementById("dayList").innerHTML = days.map((day) => `
       <article class="card day-card">
         <div class="date-block">
@@ -1239,6 +1291,7 @@
           <div class="label">Base plan</div>
           <h3>${escapeHtml(day[3])}</h3>
           ${renderConfirmedStrip(day[0])}
+          ${renderChoiceStrip(day)}
           <div class="details">
             <div class="detail"><b>Food</b>${escapeHtml(day[7])}</div>
             <div class="detail"><b>Cost</b>${escapeHtml(day[8])}</div>
@@ -1259,9 +1312,15 @@
           <div class="label">Choose by energy</div>
           <h3>${escapeHtml(day[3])}</h3>
           <div class="mood-switcher">
-            <div class="mood"><strong>Low energy</strong><span>${escapeHtml(day[4])}</span></div>
-            <div class="mood"><strong>Medium</strong><span>${escapeHtml(day[5])}</span></div>
-            <div class="mood"><strong>High energy</strong><span>${escapeHtml(day[6])}</span></div>
+            <div class="mood" data-mood-card="${escapeHtml(day[0])}:low"><strong>Low energy</strong><span>${escapeHtml(day[4])}</span></div>
+            <div class="mood" data-mood-card="${escapeHtml(day[0])}:medium"><strong>Medium</strong><span>${escapeHtml(day[5])}</span></div>
+            <div class="mood" data-mood-card="${escapeHtml(day[0])}:high"><strong>High energy</strong><span>${escapeHtml(day[6])}</span></div>
+          </div>
+          <div class="option-actions">
+            <button type="button" class="confirm-button" data-day-choice="${escapeHtml(day[0])}" data-choice="low">Choose low</button>
+            <button type="button" class="confirm-button" data-day-choice="${escapeHtml(day[0])}" data-choice="medium">Choose medium</button>
+            <button type="button" class="confirm-button" data-day-choice="${escapeHtml(day[0])}" data-choice="high">Choose high</button>
+            <button type="button" class="confirm-button" data-clear-choice="${escapeHtml(day[0])}">Clear</button>
           </div>
         </div>
       </article>
@@ -1368,6 +1427,29 @@
       });
     };
 
+    const updateDayChoices = () => {
+      days.forEach((day) => {
+        const choice = state.dayChoices[day[0]];
+        const text = getChoiceText(day, choice);
+        const strip = document.querySelector(`[data-day-choice-summary="${day[0]}"]`);
+        if (strip) {
+          strip.classList.toggle("visible", Boolean(choice && text));
+          strip.innerHTML = choice && text ? `<b>Selected option:</b> ${escapeHtml(choiceLabel[choice])} - ${escapeHtml(text)}` : "";
+        }
+      });
+
+      document.querySelectorAll("[data-day-choice]").forEach((button) => {
+        const active = state.dayChoices[button.dataset.dayChoice] === button.dataset.choice;
+        button.classList.toggle("active", active);
+        button.textContent = active ? `Selected ${button.dataset.choice}` : `Choose ${button.dataset.choice}`;
+      });
+
+      document.querySelectorAll("[data-mood-card]").forEach((card) => {
+        const [dayId, choice] = card.dataset.moodCard.split(":");
+        card.classList.toggle("selected", state.dayChoices[dayId] === choice);
+      });
+    };
+
     const updateProgress = () => {
       const confirmed = confirmables.filter((item) => state.confirmed[item[0]]);
       const prepItems = prepGroups.flatMap((group) => group.items);
@@ -1387,6 +1469,7 @@
       });
       document.querySelectorAll("[data-prep-row]").forEach((row) => row.classList.toggle("done", Boolean(state.prep[row.dataset.prepRow])));
       updateConfirmedStrips();
+      updateDayChoices();
     };
 
     injectConfirmButtons();
@@ -1397,6 +1480,24 @@
       if (!button) return;
       const id = button.dataset.confirm;
       state.confirmed[id] = !state.confirmed[id];
+      saveState();
+      updateProgress();
+    });
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-day-choice]");
+      if (!button) return;
+      state.dayChoices[button.dataset.dayChoice] = button.dataset.choice;
+      saveState();
+      updateProgress();
+      location.hash = "itinerary";
+      showPage("itinerary");
+    });
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-clear-choice]");
+      if (!button) return;
+      delete state.dayChoices[button.dataset.clearChoice];
       saveState();
       updateProgress();
     });
@@ -1413,6 +1514,7 @@
       if (!confirm("Clear confirmed bookings and checklist progress on this device?")) return;
       state.confirmed = {};
       state.prep = {};
+      state.dayChoices = {};
       saveState();
       document.querySelectorAll("[data-prep]").forEach((input) => { input.checked = false; });
       updateProgress();
@@ -1431,25 +1533,29 @@
     `).join("");
 
     const navButtons = [...document.querySelectorAll(".nav button")];
-    const sections = navButtons.map((button) => document.getElementById(button.dataset.target));
+    const pages = [...document.querySelectorAll("[data-page-section]")];
+    const validPages = new Set(pages.map((page) => page.dataset.pageSection));
+
+    const showPage = (pageName) => {
+      const page = validPages.has(pageName) ? pageName : "overview";
+      pages.forEach((section) => {
+        section.classList.toggle("active-page", section.dataset.pageSection === page);
+      });
+      navButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.page === page);
+      });
+      window.scrollTo({ top: document.querySelector(".shell").offsetTop - 8, behavior: "smooth" });
+    };
 
     navButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        document.getElementById(button.dataset.target).scrollIntoView({ behavior: "smooth", block: "start" });
+        location.hash = button.dataset.page;
+        showPage(button.dataset.page);
       });
     });
 
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (!visible) return;
-      navButtons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.target === visible.target.id);
-      });
-    }, { rootMargin: "-18% 0px -65% 0px", threshold: [0.1, 0.2, 0.4] });
-
-    sections.forEach((section) => observer.observe(section));
+    window.addEventListener("hashchange", () => showPage(location.hash.replace("#", "")));
+    showPage(location.hash.replace("#", "") || "overview");
   </script>
 </body>
 </html>
