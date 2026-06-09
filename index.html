@@ -314,6 +314,160 @@
       border-color: #e5c0c6;
     }
 
+    .progress-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 16px;
+      margin: 18px 0 0;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 28px rgba(56, 44, 35, 0.07);
+    }
+
+    .progress-track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--moss), var(--sea));
+      transition: width 0.2s ease;
+    }
+
+    .confirm-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .summary-box {
+      padding: 12px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      min-height: 72px;
+    }
+
+    .summary-box strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 3px;
+    }
+
+    .summary-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .checklist-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .checklist-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .checklist-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      background: var(--soft);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .checklist-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .checklist-items {
+      display: grid;
+    }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .check-item:last-child {
+      border-bottom: 0;
+    }
+
+    .check-item input {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--moss);
+    }
+
+    .check-item strong {
+      display: block;
+      line-height: 1.25;
+    }
+
+    .check-item p {
+      margin: 4px 0 0;
+      font-size: 13px;
+    }
+
+    .check-item.done strong,
+    .check-item.done p {
+      color: #8a8f95;
+    }
+
+    .confirm-button {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      min-height: 36px;
+      padding: 8px 10px;
+      background: white;
+      color: var(--ink);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .confirm-button.active {
+      background: #eef4ea;
+      color: #3f5a38;
+      border-color: #ceddc8;
+    }
+
+    .confirmed-strip {
+      display: none;
+      margin: 12px 0 0;
+      padding: 10px;
+      border-radius: 7px;
+      background: #eef4ea;
+      border: 1px solid #ceddc8;
+      color: #3f5a38;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .confirmed-strip.visible {
+      display: block;
+    }
+
     .timeline {
       display: grid;
       gap: 12px;
@@ -539,6 +693,16 @@
       .budget-table {
         min-width: 720px;
       }
+
+      .progress-panel,
+      .confirm-summary,
+      .check-item {
+        grid-template-columns: 1fr;
+      }
+
+      .check-item {
+        gap: 8px;
+      }
     }
   </style>
 </head>
@@ -562,6 +726,7 @@
       <button data-target="hotels">Hotels</button>
       <button data-target="food">Food</button>
       <button data-target="experiences">Experiences</button>
+      <button data-target="prep">To Do</button>
       <button data-target="budget">Budget</button>
       <button data-target="links">Links</button>
     </nav>
@@ -587,6 +752,30 @@
         <div class="stat">
           <div class="label">Best Splurge</div>
           <strong>Byakudan ryokan</strong>
+        </div>
+      </div>
+      <div class="progress-panel">
+        <div>
+          <div class="label">Planning Progress</div>
+          <strong id="progressText">0 confirmed · 0 to do complete</strong>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        <button class="confirm-button" id="resetProgress" type="button">Reset</button>
+      </div>
+      <div class="confirm-summary">
+        <div class="summary-box">
+          <strong id="confirmedHotelCount">0</strong>
+          <span>confirmed hotels</span>
+        </div>
+        <div class="summary-box">
+          <strong id="confirmedActivityCount">0</strong>
+          <span>confirmed experiences</span>
+        </div>
+        <div class="summary-box">
+          <strong id="completedPrepCount">0</strong>
+          <span>travel tasks done</span>
         </div>
       </div>
       <section>
@@ -657,6 +846,14 @@
       <div class="grid" id="experienceList"></div>
     </section>
 
+    <section id="prep">
+      <div class="section-head">
+        <h2>Before We Go</h2>
+        <p class="section-note">The practical stuff that turns this from a pretty plan into a trip you can actually take. Checked items save locally on this device.</p>
+      </div>
+      <div class="checklist-grid" id="prepList"></div>
+    </section>
+
     <section id="budget">
       <div class="section-head">
         <h2>Budget</h2>
@@ -682,21 +879,21 @@
 
   <script>
     const days = [
-      ["Fri Sep 18", "Tokyo / All Day Place Shibuya", "Arrive Narita 8pm, transfer, check in, konbini snacks", "Private transfer + sleep", "Train + late snack", "None; protect energy", "7-Eleven/Lawson or hotel-area ramen", "$30-$180 transfer + snacks", "Optional transfer", "Late arrival; do not plan a real dinner."],
-      ["Sat Sep 19", "Tokyo / Shibuya", "Meiji Shrine, Harajuku, Omotesando, Shibuya Crossing", "Meiji Shrine + one cafe", "Harajuku/Omotesando walk", "Add Shibuya Sky sunset", "Pizza/coffee at hotel, izakaya, Shibuya dinner", "$80-$250", "Shibuya Sky yes", "Good intro day with room to nap."],
-      ["Sun Sep 20", "Tokyo / Shibuya", "Mass, Asakusa, Senso-ji, Sumida River, Skytree", "Mass + Asakusa only", "Asakusa + river walk", "Add Skytree evening", "Asakusa tempura, casual ramen, dessert stops", "$80-$220", "Skytree optional", "Confirm Mass schedule closer to travel."],
-      ["Mon Sep 21", "Tokyo / Shibuya", "Tokyo DisneySea full day", "Skip/late start if jet lag hits", "DisneySea with early exit", "Full open-to-close DisneySea", "DisneySea snacks + late casual dinner", "$180-$350+", "Yes", "Buy tickets early; consider Premier Access budget."],
-      ["Tue Sep 22", "Tokyo / Shibuya", "Go-kart or adventure, teamLab Planets, Odaiba", "teamLab only + waterfront", "teamLab + Odaiba dinner", "Go-kart + teamLab + bay sunset", "Waterfront dinner or Tsukiji/Toyosu sushi", "$120-$450", "teamLab yes; go-kart yes", "Go-kart requires IDP/licensing logistics."],
-      ["Wed Sep 23", "Tokyo / K5", "Hidden gems, shopping, Nakameguro/Daikanyama, Shimokitazawa/Ginza", "Move hotels + K5 lounge/cafe", "Daikanyama/Nakameguro", "Add Ginza or cocktail bar", "K5 area cafe/bar, izakaya", "$100-$300", "Dinner maybe", "This is a good flexible buffer day."],
-      ["Thu Sep 24", "Hakone / Byakudan", "Fuji sightseeing, Chureito Pagoda, Kawaguchiko, check-in, onsen, kaiseki", "Direct to ryokan and rest", "Hakone Open-Air Museum + ryokan", "Fuji views + ropeway + ryokan", "Ryokan kaiseki dinner", "Included/paid in ryokan", "Ryokan yes", "Avoid overpacking this day; travel is real."],
-      ["Fri Sep 25", "Hakone / Byakudan", "Slow ryokan morning, Hakone Ropeway, Lake Ashi, Open-Air Museum", "Onsen + spa + short walk", "Open-Air Museum + Lake Ashi", "Full Hakone loop", "Ryokan breakfast/dinner", "$40-$150 activities", "Maybe", "Best pure honeymoon/rest day."],
-      ["Sat Sep 26", "Kyoto / Ace Hotel", "Travel to Kyoto, nearby cafes/shops, Gion, Yasaka Shrine", "Arrive + hotel/cafe only", "Gion evening walk", "Add Pontocho dinner", "Gion/Pontocho dinner", "$120-$300", "Dinner yes", "Forward luggage from Hakone/Tokyo if possible."],
-      ["Sun Sep 27", "Kyoto / Ace Hotel", "Mass, Fushimi Inari, Kiyomizu-dera, Higashiyama", "Mass + one temple", "Fushimi Inari + Higashiyama", "Full temple day", "Nishiki/Pontocho/casual Kyoto dinner", "$80-$220", "Dinner maybe", "This can become too much; pick priorities."],
-      ["Mon Sep 28", "Kyoto / Celestine Gion", "Arashiyama, Bamboo Grove, Tenryu-ji, Togetsukyo, Monkey Park", "Move hotels + tea/cafe", "Bamboo Grove + Tenryu-ji", "Full Arashiyama + Monkey Park", "Matcha cafe, Gion dinner", "$80-$260", "Dinner yes", "Early start helps crowds a lot."],
-      ["Tue Sep 29", "Kyoto / Celestine Gion", "Nara half-day, Todai-ji, deer park, spa/rest, nice dinner", "Spa/rest in Kyoto", "Nara half-day", "Nara + celebratory Kyoto dinner", "Kaiseki, obanzai, or tempura", "$150-$600", "Dinner yes", "Good night for nicer Kyoto meal."],
-      ["Wed Sep 30", "Osaka / TBD", "Travel to Osaka, Osaka Castle, Shinsaibashi, Dotonbori food crawl", "Check in + Dotonbori only", "Castle grounds + Dotonbori", "Add Umeda or bar hopping", "Takoyaki, okonomiyaki, kushikatsu", "$80-$220", "No", "Osaka should feel fun and loose."],
-      ["Thu Oct 1", "Osaka / TBD", "Kuromon Market, choose Kobe/Umeda/shopping/spa, final dinner", "Spa + final dinner", "Kuromon + Umeda Sky", "Kobe day trip", "Final dinner: Osaka beef/sushi/teppanyaki", "$180-$700", "Final dinner yes", "Make this the farewell meal night."],
-      ["Fri Oct 2", "Departure from Osaka", "Breakfast, packing, airport transfer, fly to SFO", "No plans", "Final cafe if timing allows", "No; protect flight", "Airport/nearby breakfast", "$40-$120 transfer/food", "No", "Confirm airport and transfer time."]
+      ["sep18", "Fri Sep 18", "Tokyo / All Day Place Shibuya", "Arrive Narita 8pm, transfer, check in, konbini snacks", "Private transfer + sleep", "Train + late snack", "None; protect energy", "7-Eleven/Lawson or hotel-area ramen", "$30-$180 transfer + snacks", "Optional transfer", "Late arrival; do not plan a real dinner."],
+      ["sep19", "Sat Sep 19", "Tokyo / Shibuya", "Meiji Shrine, Harajuku, Omotesando, Shibuya Crossing", "Meiji Shrine + one cafe", "Harajuku/Omotesando walk", "Add Shibuya Sky sunset", "Pizza/coffee at hotel, izakaya, Shibuya dinner", "$80-$250", "Shibuya Sky yes", "Good intro day with room to nap."],
+      ["sep20", "Sun Sep 20", "Tokyo / Shibuya", "Mass, Asakusa, Senso-ji, Sumida River, Skytree", "Mass + Asakusa only", "Asakusa + river walk", "Add Skytree evening", "Asakusa tempura, casual ramen, dessert stops", "$80-$220", "Skytree optional", "Confirm Mass schedule closer to travel."],
+      ["sep21", "Mon Sep 21", "Tokyo / Shibuya", "Tokyo DisneySea full day", "Skip/late start if jet lag hits", "DisneySea with early exit", "Full open-to-close DisneySea", "DisneySea snacks + late casual dinner", "$180-$350+", "Yes", "Buy tickets early; consider Premier Access budget."],
+      ["sep22", "Tue Sep 22", "Tokyo / Shibuya", "Go-kart or adventure, teamLab Planets, Odaiba", "teamLab only + waterfront", "teamLab + Odaiba dinner", "Go-kart + teamLab + bay sunset", "Waterfront dinner or Tsukiji/Toyosu sushi", "$120-$450", "teamLab yes; go-kart yes", "Go-kart requires IDP/licensing logistics."],
+      ["sep23", "Wed Sep 23", "Tokyo / K5", "Hidden gems, shopping, Nakameguro/Daikanyama, Shimokitazawa/Ginza", "Move hotels + K5 lounge/cafe", "Daikanyama/Nakameguro", "Add Ginza or cocktail bar", "K5 area cafe/bar, izakaya", "$100-$300", "Dinner maybe", "This is a good flexible buffer day."],
+      ["sep24", "Thu Sep 24", "Hakone / Byakudan", "Fuji sightseeing, Chureito Pagoda, Kawaguchiko, check-in, onsen, kaiseki", "Direct to ryokan and rest", "Hakone Open-Air Museum + ryokan", "Fuji views + ropeway + ryokan", "Ryokan kaiseki dinner", "Included/paid in ryokan", "Ryokan yes", "Avoid overpacking this day; travel is real."],
+      ["sep25", "Fri Sep 25", "Hakone / Byakudan", "Slow ryokan morning, Hakone Ropeway, Lake Ashi, Open-Air Museum", "Onsen + spa + short walk", "Open-Air Museum + Lake Ashi", "Full Hakone loop", "Ryokan breakfast/dinner", "$40-$150 activities", "Maybe", "Best pure honeymoon/rest day."],
+      ["sep26", "Sat Sep 26", "Kyoto / Ace Hotel", "Travel to Kyoto, nearby cafes/shops, Gion, Yasaka Shrine", "Arrive + hotel/cafe only", "Gion evening walk", "Add Pontocho dinner", "Gion/Pontocho dinner", "$120-$300", "Dinner yes", "Forward luggage from Hakone/Tokyo if possible."],
+      ["sep27", "Sun Sep 27", "Kyoto / Ace Hotel", "Mass, Fushimi Inari, Kiyomizu-dera, Higashiyama", "Mass + one temple", "Fushimi Inari + Higashiyama", "Full temple day", "Nishiki/Pontocho/casual Kyoto dinner", "$80-$220", "Dinner maybe", "This can become too much; pick priorities."],
+      ["sep28", "Mon Sep 28", "Kyoto / Celestine Gion", "Arashiyama, Bamboo Grove, Tenryu-ji, Togetsukyo, Monkey Park", "Move hotels + tea/cafe", "Bamboo Grove + Tenryu-ji", "Full Arashiyama + Monkey Park", "Matcha cafe, Gion dinner", "$80-$260", "Dinner yes", "Early start helps crowds a lot."],
+      ["sep29", "Tue Sep 29", "Kyoto / Celestine Gion", "Nara half-day, Todai-ji, deer park, spa/rest, nice dinner", "Spa/rest in Kyoto", "Nara half-day", "Nara + celebratory Kyoto dinner", "Kaiseki, obanzai, or tempura", "$150-$600", "Dinner yes", "Good night for nicer Kyoto meal."],
+      ["sep30", "Wed Sep 30", "Osaka / TBD", "Travel to Osaka, Osaka Castle, Shinsaibashi, Dotonbori food crawl", "Check in + Dotonbori only", "Castle grounds + Dotonbori", "Add Umeda or bar hopping", "Takoyaki, okonomiyaki, kushikatsu", "$80-$220", "No", "Osaka should feel fun and loose."],
+      ["oct01", "Thu Oct 1", "Osaka / TBD", "Kuromon Market, choose Kobe/Umeda/shopping/spa, final dinner", "Spa + final dinner", "Kuromon + Umeda Sky", "Kobe day trip", "Final dinner: Osaka beef/sushi/teppanyaki", "$180-$700", "Final dinner yes", "Make this the farewell meal night."],
+      ["oct02", "Fri Oct 2", "Departure from Osaka", "Breakfast, packing, airport transfer, fly to SFO", "No plans", "Final cafe if timing allows", "No; protect flight", "Airport/nearby breakfast", "$40-$120 transfer/food", "No", "Confirm airport and transfer time."]
     ];
 
     const hotels = [
@@ -760,32 +957,108 @@
       ["teamLab Planets", "Timed-entry tickets", "https://www.teamlab.art/e/planets/"]
     ];
 
+    const prepGroups = [
+      {
+        title: "Book the scarce stuff",
+        due: "Best 3-6 months out",
+        items: [
+          ["book-hotels", "Lock hotels and cancellation windows", "Confirm All Day Place, K5, Byakudan, Ace/Celestine, and Osaka hotel with room type and cancellation dates.", ["sep18", "sep23", "sep24", "sep26", "sep28", "sep30"]],
+          ["book-disney", "Buy Tokyo DisneySea tickets", "Sep 21 official adult ticket is ¥9,900 each before Premier Access, food, or merch.", ["sep21"]],
+          ["book-teamlab", "Book teamLab Planets timed entry", "Standard adult entry starts around ¥3,600/person; timed slots can matter.", ["sep22"]],
+          ["book-final-dinner", "Reserve final Osaka dinner", "Pick teppanyaki, Kobe beef, sushi, or a special Osaka restaurant for Oct 1.", ["oct01"]]
+        ]
+      },
+      {
+        title: "Travel logistics",
+        due: "Best 1-3 months out",
+        items: [
+          ["passport-check", "Confirm passports and entry requirements", "Make sure passports are valid and check Japan entry rules close to departure."],
+          ["airport-plan", "Decide Narita transfer plan", "Late arrival means either private transfer or a very simple train plan to Shibuya.", ["sep18"]],
+          ["luggage-forwarding", "Plan luggage forwarding", "Use takkyubin between Tokyo/Hakone/Kyoto/Osaka if you want hands-free train days.", ["sep24", "sep26", "sep30"]],
+          ["wifi-esim", "Order eSIM or pocket Wi-Fi", "Pick one primary data option and keep roaming as backup."]
+        ]
+      },
+      {
+        title: "Money and documents",
+        due: "Best 2-4 weeks out",
+        items: [
+          ["fx-cash", "Plan cash and cards", "Japan is card-friendly but cash still helps for temples, small food shops, and transit backup."],
+          ["travel-insurance", "Consider travel insurance", "Especially useful if the ryokan/hotel cancellation exposure is high."],
+          ["copies", "Save document copies", "Passports, flights, hotels, insurance, and emergency contacts in phone + cloud."]
+        ]
+      },
+      {
+        title: "Week-of prep",
+        due: "Final 7 days",
+        items: [
+          ["mass-schedules", "Re-check Sunday Mass schedules", "St. Ignatius Tokyo and St. Francis Xavier Kyoto schedules can change.", ["sep20", "sep27"]],
+          ["weather-pack", "Check weather and pack", "Late September can be warm/humid with rain risk; bring walkable shoes and one nicer dinner outfit."],
+          ["download-offline", "Download offline maps and confirmations", "Save hotel addresses in Japanese/English and keep QR codes accessible."],
+          ["confirm-transport", "Confirm flight, train, and airport timing", "Protect the late arrival night and Osaka departure day.", ["sep18", "oct02"]]
+        ]
+      }
+    ];
+
+    const confirmables = [
+      ["hotel-all-day", "Hotel", "All Day Place Shibuya", "Sep 18-22", "Tokyo base stay", ["sep18", "sep19", "sep20", "sep21", "sep22"]],
+      ["hotel-k5", "Hotel", "K5 Tokyo", "Sep 23-25", "One MICHELIN Key boutique stay", ["sep23"]],
+      ["hotel-byakudan", "Hotel", "Hakone-Gora Byakudan", "Sep 24-26", "Ryokan / onsen / kaiseki centerpiece", ["sep24", "sep25"]],
+      ["hotel-ace", "Hotel", "Ace Hotel Kyoto", "Sep 26-28", "First Kyoto base", ["sep26", "sep27"]],
+      ["hotel-celestine", "Hotel", "The Celestine Kyoto Gion", "Sep 28-30", "One MICHELIN Key Kyoto finish", ["sep28", "sep29"]],
+      ["hotel-osaka", "Hotel", "Osaka hotel", "Sep 30-Oct 2", "Recommended: Zentis Osaka", ["sep30", "oct01", "oct02"]],
+      ["activity-disney", "Experience", "Tokyo DisneySea", "Sep 21", "Tickets and Premier Access decision", ["sep21"]],
+      ["activity-teamlab", "Experience", "teamLab Planets", "Sep 22", "Timed entry", ["sep22"]],
+      ["activity-shibuya-sky", "Experience", "Shibuya Sky", "Sep 19", "Sunset slot if wanted", ["sep19"]],
+      ["activity-spa", "Experience", "Couples spa / massage", "Sep 29", "Kyoto rest day add-on", ["sep29"]],
+      ["food-final-dinner", "Food", "Final Osaka dinner", "Oct 1", "Celebratory final meal", ["oct01"]]
+    ];
+
+    const stateKey = "japan-honeymoon-planning-v1";
+    const defaultState = { confirmed: {}, prep: {} };
+    const loadState = () => {
+      try {
+        return { ...defaultState, ...JSON.parse(localStorage.getItem(stateKey) || "{}") };
+      } catch {
+        return { ...defaultState };
+      }
+    };
+    const state = loadState();
+    const saveState = () => localStorage.setItem(stateKey, JSON.stringify(state));
+
     const escapeHtml = (value) => String(value)
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;");
 
+    const getConfirmedForDay = (dayId) => confirmables.filter((item) => item[5].includes(dayId) && state.confirmed[item[0]]);
+    const renderConfirmedStrip = (dayId) => {
+      const items = getConfirmedForDay(dayId);
+      if (!items.length) return `<div class="confirmed-strip" data-day-confirmed="${escapeHtml(dayId)}"></div>`;
+      return `<div class="confirmed-strip visible" data-day-confirmed="${escapeHtml(dayId)}"><b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" · ")}</div>`;
+    };
+
     document.getElementById("dayList").innerHTML = days.map((day) => `
       <article class="card day-card">
         <div class="date-block">
-          <strong>${escapeHtml(day[0])}</strong>
-          <span>${escapeHtml(day[1])}</span>
+          <strong>${escapeHtml(day[1])}</strong>
+          <span>${escapeHtml(day[2])}</span>
         </div>
         <div class="day-body">
           <div class="label">Base plan</div>
-          <h3>${escapeHtml(day[2])}</h3>
+          <h3>${escapeHtml(day[3])}</h3>
+          ${renderConfirmedStrip(day[0])}
           <div class="mood-switcher">
-            <div class="mood"><strong>Low energy</strong><span>${escapeHtml(day[3])}</span></div>
-            <div class="mood"><strong>Medium</strong><span>${escapeHtml(day[4])}</span></div>
-            <div class="mood"><strong>High energy</strong><span>${escapeHtml(day[5])}</span></div>
+            <div class="mood"><strong>Low energy</strong><span>${escapeHtml(day[4])}</span></div>
+            <div class="mood"><strong>Medium</strong><span>${escapeHtml(day[5])}</span></div>
+            <div class="mood"><strong>High energy</strong><span>${escapeHtml(day[6])}</span></div>
           </div>
           <div class="details">
-            <div class="detail"><b>Food</b>${escapeHtml(day[6])}</div>
-            <div class="detail"><b>Cost</b>${escapeHtml(day[7])}</div>
-            <div class="detail"><b>Book ahead</b>${escapeHtml(day[8])}</div>
+            <div class="detail"><b>Food</b>${escapeHtml(day[7])}</div>
+            <div class="detail"><b>Cost</b>${escapeHtml(day[8])}</div>
+            <div class="detail"><b>Book ahead</b>${escapeHtml(day[9])}</div>
           </div>
-          <div class="tag-row"><span class="tag">${escapeHtml(day[9])}</span></div>
+          <div class="tag-row"><span class="tag">${escapeHtml(day[10])}</span></div>
         </div>
       </article>
     `).join("");
@@ -832,6 +1105,103 @@
         </div>
       </article>
     `).join("");
+
+    document.getElementById("prepList").innerHTML = prepGroups.map((group) => `
+      <article class="card checklist-card">
+        <div class="checklist-head">
+          <h3>${escapeHtml(group.title)}</h3>
+          <span class="tag">${escapeHtml(group.due)}</span>
+        </div>
+        <div class="checklist-items">
+          ${group.items.map((item) => `
+            <label class="check-item ${state.prep[item[0]] ? "done" : ""}" data-prep-row="${escapeHtml(item[0])}">
+              <input type="checkbox" data-prep="${escapeHtml(item[0])}" ${state.prep[item[0]] ? "checked" : ""}>
+              <span>
+                <strong>${escapeHtml(item[1])}</strong>
+                <p>${escapeHtml(item[2])}</p>
+              </span>
+              ${item[3] ? `<span class="tag">Adds to itinerary</span>` : `<span class="tag">Prep</span>`}
+            </label>
+          `).join("")}
+        </div>
+      </article>
+    `).join("");
+
+    const injectConfirmButtons = () => {
+      const hotelCards = [...document.querySelectorAll("#hotelList .card")];
+      hotels.forEach((hotel, index) => {
+        const match = confirmables.find((item) => item[2] === hotel[1] || (hotel[1] === "Zentis Osaka" && item[0] === "hotel-osaka"));
+        if (!match || !hotelCards[index]) return;
+        hotelCards[index].insertAdjacentHTML("beforeend", `<button type="button" class="confirm-button" data-confirm="${escapeHtml(match[0])}">${state.confirmed[match[0]] ? "Confirmed" : "Mark confirmed"}</button>`);
+      });
+
+      const experienceCards = [...document.querySelectorAll("#experienceList .card")];
+      experiences.forEach((experience, index) => {
+        const match = confirmables.find((item) => item[2] === experience[1]);
+        if (!match || !experienceCards[index]) return;
+        experienceCards[index].insertAdjacentHTML("beforeend", `<button type="button" class="confirm-button" data-confirm="${escapeHtml(match[0])}">${state.confirmed[match[0]] ? "Confirmed" : "Mark confirmed"}</button>`);
+      });
+    };
+
+    const updateConfirmedStrips = () => {
+      days.forEach((day) => {
+        const strip = document.querySelector(`[data-day-confirmed="${day[0]}"]`);
+        if (!strip) return;
+        const items = getConfirmedForDay(day[0]);
+        strip.classList.toggle("visible", items.length > 0);
+        strip.innerHTML = items.length ? `<b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" · ")}` : "";
+      });
+    };
+
+    const updateProgress = () => {
+      const confirmed = confirmables.filter((item) => state.confirmed[item[0]]);
+      const prepItems = prepGroups.flatMap((group) => group.items);
+      const prepDone = prepItems.filter((item) => state.prep[item[0]]);
+      const total = confirmables.length + prepItems.length;
+      const done = confirmed.length + prepDone.length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      document.getElementById("progressText").textContent = `${confirmed.length} confirmed · ${prepDone.length} to do complete`;
+      document.getElementById("progressFill").style.width = `${pct}%`;
+      document.getElementById("confirmedHotelCount").textContent = confirmed.filter((item) => item[1] === "Hotel").length;
+      document.getElementById("confirmedActivityCount").textContent = confirmed.filter((item) => item[1] === "Experience").length;
+      document.getElementById("completedPrepCount").textContent = prepDone.length;
+      document.querySelectorAll("[data-confirm]").forEach((button) => {
+        const active = Boolean(state.confirmed[button.dataset.confirm]);
+        button.classList.toggle("active", active);
+        button.textContent = active ? "Confirmed" : "Mark confirmed";
+      });
+      document.querySelectorAll("[data-prep-row]").forEach((row) => row.classList.toggle("done", Boolean(state.prep[row.dataset.prepRow])));
+      updateConfirmedStrips();
+    };
+
+    injectConfirmButtons();
+    updateProgress();
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-confirm]");
+      if (!button) return;
+      const id = button.dataset.confirm;
+      state.confirmed[id] = !state.confirmed[id];
+      saveState();
+      updateProgress();
+    });
+
+    document.addEventListener("change", (event) => {
+      const input = event.target.closest("[data-prep]");
+      if (!input) return;
+      state.prep[input.dataset.prep] = input.checked;
+      saveState();
+      updateProgress();
+    });
+
+    document.getElementById("resetProgress").addEventListener("click", () => {
+      if (!confirm("Clear confirmed bookings and checklist progress on this device?")) return;
+      state.confirmed = {};
+      state.prep = {};
+      saveState();
+      document.querySelectorAll("[data-prep]").forEach((input) => { input.checked = false; });
+      updateProgress();
+    });
 
     document.getElementById("budgetTable").innerHTML = `
       <thead><tr>${budget[0].map((cell) => `<th>${escapeHtml(cell)}</th>`).join("")}</tr></thead>
