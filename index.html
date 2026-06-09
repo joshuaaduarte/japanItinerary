@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -452,6 +452,33 @@
       border-color: #ceddc8;
     }
 
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mini-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      border-radius: 7px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .location-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
     .confirmed-strip {
       display: none;
       margin: 12px 0 0;
@@ -709,7 +736,7 @@
 <body>
   <header class="hero">
     <div class="hero-inner">
-      <div class="eyebrow">Sep 18 - Oct 2, 2026 · Tokyo · Hakone · Kyoto · Osaka</div>
+      <div class="eyebrow">Sep 18 - Oct 2, 2026 - Tokyo - Hakone - Kyoto - Osaka</div>
       <h1>Japan Honeymoon</h1>
       <p class="hero-copy">A phone-friendly itinerary for Joshua and Ana: romantic where it matters, flexible when energy dips, and practical enough to actually use day by day.</p>
       <div class="hero-actions">
@@ -722,7 +749,8 @@
   <main class="shell">
     <nav class="nav" aria-label="Itinerary sections">
       <button class="active" data-target="overview">Overview</button>
-      <button data-target="days">Daily Plan</button>
+      <button data-target="days">Itinerary</button>
+      <button data-target="day-options">Day Options</button>
       <button data-target="hotels">Hotels</button>
       <button data-target="food">Food</button>
       <button data-target="experiences">Experiences</button>
@@ -757,7 +785,7 @@
       <div class="progress-panel">
         <div>
           <div class="label">Planning Progress</div>
-          <strong id="progressText">0 confirmed · 0 to do complete</strong>
+          <strong id="progressText">0 confirmed - 0 to do complete</strong>
           <div class="progress-track" aria-hidden="true">
             <div class="progress-fill" id="progressFill"></div>
           </div>
@@ -786,7 +814,7 @@
             <p>Hotel ranges were revised against current Expedia/Booking/KAYAK/Michelin/official anchors. DisneySea and teamLab use official ticket pricing; hotel dates still need one final booking-page check before reserving.</p>
             <div class="tag-row">
               <span class="tag keep">Updated Jun 8, 2026</span>
-              <span class="tag">¥160/USD planning FX</span>
+              <span class="tag">yen 160/USD planning FX</span>
               <span class="tag splurge">Live rates can move</span>
             </div>
           </article>
@@ -816,10 +844,18 @@
 
     <section id="days">
       <div class="section-head">
-        <h2>Daily Plan</h2>
-        <p class="section-note">Each day has a base plan plus low, medium, and high-energy versions so you can decide in the morning without re-planning the trip.</p>
+        <h2>Itinerary</h2>
+        <p class="section-note">The clean day-by-day version: where you are, the main plan, food idea, estimated spend, and anything already confirmed.</p>
       </div>
       <div class="timeline" id="dayList"></div>
+    </section>
+
+    <section id="day-options">
+      <div class="section-head">
+        <h2>Day Options</h2>
+        <p class="section-note">Use this when you want to decide based on energy. The main itinerary stays calm, and the flexible choices live here.</p>
+      </div>
+      <div class="timeline" id="dayOptionsList"></div>
     </section>
 
     <section id="hotels">
@@ -957,14 +993,169 @@
       ["teamLab Planets", "Timed-entry tickets", "https://www.teamlab.art/e/planets/"]
     ];
 
+    const hotelMeta = {
+      "All Day Place Shibuya": {
+        site: "https://www.uds-hotels.com/en/all-day-place/",
+        map: "https://www.google.com/maps/search/?api=1&query=All+Day+Place+Shibuya+Tokyo",
+        location: "Shibuya, Tokyo"
+      },
+      "K5": {
+        site: "https://k5-tokyo.com/",
+        map: "https://www.google.com/maps/search/?api=1&query=K5+Tokyo+Hotel",
+        location: "Nihonbashi Kabutocho, Tokyo"
+      },
+      "TRUNK Hotel / Yoyogi Park": {
+        site: "https://yoyogipark.trunk-hotel.com/",
+        map: "https://www.google.com/maps/search/?api=1&query=TRUNK+HOTEL+YOYOGI+PARK",
+        location: "Tomigaya / Yoyogi Park, Tokyo"
+      },
+      "Hakone-Gora Byakudan": {
+        site: "https://www.byakudan.co.jp/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Hakone-Gora+Byakudan",
+        location: "Gora, Hakone"
+      },
+      "Gora Kadan": {
+        site: "https://www.gorakadan.com/",
+        map: "https://www.google.com/maps/search/?api=1&query=Gora+Kadan+Hakone",
+        location: "Gora, Hakone"
+      },
+      "Ace Hotel Kyoto": {
+        site: "https://acehotel.com/kyoto/",
+        map: "https://www.google.com/maps/search/?api=1&query=Ace+Hotel+Kyoto",
+        location: "Karasuma Oike, Kyoto"
+      },
+      "The Celestine Kyoto Gion": {
+        site: "https://www.celestinehotels.jp/kyoto-gion/",
+        map: "https://www.google.com/maps/search/?api=1&query=Hotel+The+Celestine+Kyoto+Gion",
+        location: "Gion, Kyoto"
+      },
+      "Hotel The Mitsui Kyoto": {
+        site: "https://www.hotelthemitsui.com/en/kyoto/",
+        map: "https://www.google.com/maps/search/?api=1&query=Hotel+The+Mitsui+Kyoto",
+        location: "Nijo Castle area, Kyoto"
+      },
+      "Zentis Osaka": {
+        site: "https://zentishotels.com/en/osaka/",
+        map: "https://www.google.com/maps/search/?api=1&query=Zentis+Osaka",
+        location: "Dojima / Kita, Osaka"
+      },
+      "The Royal Park Hotel Iconic Osaka Midosuji": {
+        site: "https://www.royalparkhotels.co.jp/the/osakamidosuji/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=The+Royal+Park+Hotel+Iconic+Osaka+Midosuji",
+        location: "Midosuji / Yodoyabashi, Osaka"
+      },
+      "Conrad Osaka": {
+        site: "https://www.hilton.com/en/hotels/osacici-conrad-osaka/",
+        map: "https://www.google.com/maps/search/?api=1&query=Conrad+Osaka",
+        location: "Nakanoshima, Osaka"
+      }
+    };
+
+    const experienceMeta = {
+      "Shibuya Sky sunset": {
+        site: "https://www.shibuya-scramble-square.com/sky/",
+        map: "https://www.google.com/maps/search/?api=1&query=Shibuya+Sky",
+        location: "Shibuya Scramble Square, Tokyo"
+      },
+      "Tokyo DisneySea": {
+        site: "https://www.tokyodisneyresort.jp/en/tds/",
+        map: "https://www.google.com/maps/search/?api=1&query=Tokyo+DisneySea",
+        location: "Urayasu, Chiba"
+      },
+      "teamLab Planets": {
+        site: "https://www.teamlab.art/e/planets/",
+        map: "https://www.google.com/maps/search/?api=1&query=teamLab+Planets+TOKYO",
+        location: "Toyosu, Tokyo"
+      },
+      "Go-kart / street kart": {
+        site: "https://kart.st/",
+        map: "https://www.google.com/maps/search/?api=1&query=Street+Kart+Tokyo",
+        location: "Tokyo, operator-dependent"
+      },
+      "Private onsen / ryokan time": {
+        site: "https://www.byakudan.co.jp/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Hakone-Gora+Byakudan",
+        location: "Byakudan, Hakone"
+      },
+      "Hakone loop": {
+        site: "https://www.hakonenavi.jp/international/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Hakone+Ropeway+Lake+Ashi",
+        location: "Hakone"
+      },
+      "Fushimi Inari + Higashiyama": {
+        site: "https://kyoto.travel/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Fushimi+Inari+Kyoto",
+        location: "Kyoto"
+      },
+      "Arashiyama": {
+        site: "https://kyoto.travel/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Arashiyama+Bamboo+Grove",
+        location: "Arashiyama, Kyoto"
+      },
+      "Couples spa / massage": {
+        site: "https://www.google.com/search?q=Kyoto+couples+spa+massage+Gion",
+        map: "https://www.google.com/maps/search/?api=1&query=Kyoto+couples+spa+Gion",
+        location: "Kyoto, exact spa TBD"
+      },
+      "Dotonbori food crawl": {
+        site: "https://osaka-info.jp/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Dotonbori+Osaka",
+        location: "Dotonbori, Osaka"
+      },
+      "Kobe day trip": {
+        site: "https://www.feel-kobe.jp/en/",
+        map: "https://www.google.com/maps/search/?api=1&query=Kobe+Harborland",
+        location: "Kobe"
+      }
+    };
+
+    const foodMeta = {
+      "Konbini snack run near Shibuya": {
+        map: "https://www.google.com/maps/search/?api=1&query=Lawson+FamilyMart+7-Eleven+Shibuya",
+        location: "Near All Day Place Shibuya"
+      },
+      "Ramen/izakaya in Shibuya or Ebisu": {
+        map: "https://www.google.com/maps/search/?api=1&query=ramen+izakaya+Shibuya+Ebisu+Tokyo",
+        location: "Shibuya / Ebisu"
+      },
+      "Sushi/omakase or modern Japanese dinner": {
+        map: "https://www.google.com/maps/search/?api=1&query=sushi+omakase+Tokyo",
+        location: "Tokyo, exact restaurant TBD"
+      },
+      "Caveman / K5 bar-cafe ecosystem or nearby Nihonbashi dinner": {
+        map: "https://www.google.com/maps/search/?api=1&query=K5+Tokyo+Caveman+Nihonbashi",
+        location: "K5 / Nihonbashi"
+      },
+      "Kaiseki dinner + traditional breakfast at Byakudan": {
+        map: "https://www.google.com/maps/search/?api=1&query=Hakone-Gora+Byakudan",
+        location: "Byakudan, Hakone"
+      },
+      "Nishiki Market snacks / Pontocho / obanzai": {
+        map: "https://www.google.com/maps/search/?api=1&query=Nishiki+Market+Pontocho+Kyoto",
+        location: "Central Kyoto"
+      },
+      "Kaiseki, tempura, or sushi dinner in Gion": {
+        map: "https://www.google.com/maps/search/?api=1&query=kaiseki+tempura+sushi+Gion+Kyoto",
+        location: "Gion, Kyoto"
+      },
+      "Dotonbori: takoyaki, okonomiyaki, kushikatsu": {
+        map: "https://www.google.com/maps/search/?api=1&query=Dotonbori+takoyaki+okonomiyaki+kushikatsu",
+        location: "Dotonbori, Osaka"
+      },
+      "Teppanyaki/Kobe beef/sushi celebration dinner": {
+        map: "https://www.google.com/maps/search/?api=1&query=teppanyaki+Kobe+beef+sushi+Osaka",
+        location: "Osaka, exact restaurant TBD"
+      }
+    };
+
     const prepGroups = [
       {
         title: "Book the scarce stuff",
         due: "Best 3-6 months out",
         items: [
           ["book-hotels", "Lock hotels and cancellation windows", "Confirm All Day Place, K5, Byakudan, Ace/Celestine, and Osaka hotel with room type and cancellation dates.", ["sep18", "sep23", "sep24", "sep26", "sep28", "sep30"]],
-          ["book-disney", "Buy Tokyo DisneySea tickets", "Sep 21 official adult ticket is ¥9,900 each before Premier Access, food, or merch.", ["sep21"]],
-          ["book-teamlab", "Book teamLab Planets timed entry", "Standard adult entry starts around ¥3,600/person; timed slots can matter.", ["sep22"]],
+          ["book-disney", "Buy Tokyo DisneySea tickets", "Sep 21 official adult ticket is yen 9,900 each before Premier Access, food, or merch.", ["sep21"]],
+          ["book-teamlab", "Book teamLab Planets timed entry", "Standard adult entry starts around yen 3,600/person; timed slots can matter.", ["sep22"]],
           ["book-final-dinner", "Reserve final Osaka dinner", "Pick teppanyaki, Kobe beef, sushi, or a special Osaka restaurant for Oct 1.", ["oct01"]]
         ]
       },
@@ -1035,7 +1226,7 @@
     const renderConfirmedStrip = (dayId) => {
       const items = getConfirmedForDay(dayId);
       if (!items.length) return `<div class="confirmed-strip" data-day-confirmed="${escapeHtml(dayId)}"></div>`;
-      return `<div class="confirmed-strip visible" data-day-confirmed="${escapeHtml(dayId)}"><b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" · ")}</div>`;
+      return `<div class="confirmed-strip visible" data-day-confirmed="${escapeHtml(dayId)}"><b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" - ")}</div>`;
     };
 
     document.getElementById("dayList").innerHTML = days.map((day) => `
@@ -1048,11 +1239,6 @@
           <div class="label">Base plan</div>
           <h3>${escapeHtml(day[3])}</h3>
           ${renderConfirmedStrip(day[0])}
-          <div class="mood-switcher">
-            <div class="mood"><strong>Low energy</strong><span>${escapeHtml(day[4])}</span></div>
-            <div class="mood"><strong>Medium</strong><span>${escapeHtml(day[5])}</span></div>
-            <div class="mood"><strong>High energy</strong><span>${escapeHtml(day[6])}</span></div>
-          </div>
           <div class="details">
             <div class="detail"><b>Food</b>${escapeHtml(day[7])}</div>
             <div class="detail"><b>Cost</b>${escapeHtml(day[8])}</div>
@@ -1063,49 +1249,78 @@
       </article>
     `).join("");
 
+    document.getElementById("dayOptionsList").innerHTML = days.map((day) => `
+      <article class="card day-card">
+        <div class="date-block">
+          <strong>${escapeHtml(day[1])}</strong>
+          <span>${escapeHtml(day[2])}</span>
+        </div>
+        <div class="day-body">
+          <div class="label">Choose by energy</div>
+          <h3>${escapeHtml(day[3])}</h3>
+          <div class="mood-switcher">
+            <div class="mood"><strong>Low energy</strong><span>${escapeHtml(day[4])}</span></div>
+            <div class="mood"><strong>Medium</strong><span>${escapeHtml(day[5])}</span></div>
+            <div class="mood"><strong>High energy</strong><span>${escapeHtml(day[6])}</span></div>
+          </div>
+        </div>
+      </article>
+    `).join("");
+
     document.getElementById("hotelList").innerHTML = hotels.map((hotel) => {
       const keyClass = hotel[7].includes("Key") ? " key" : "";
       const verdictClass = hotel[9].includes("Keep") || hotel[9].includes("Recommended") ? " keep" : hotel[9].includes("splurge") || hotel[9].includes("budget expands") ? " splurge" : "";
+      const meta = hotelMeta[hotel[1]];
       return `
         <article class="card">
           <div class="label">${escapeHtml(hotel[0])} · ${escapeHtml(hotel[3])} nights</div>
           <h3>${escapeHtml(hotel[1])}</h3>
           <p>${escapeHtml(hotel[4])}</p>
+          ${meta ? `<div class="location-note"><b>Location:</b> ${escapeHtml(meta.location)}</div>` : ""}
           <div class="tag-row">
             <span class="tag${verdictClass}">${escapeHtml(hotel[9])}</span>
             <span class="tag${keyClass}">${escapeHtml(hotel[7])}</span>
             <span class="tag">${escapeHtml(hotel[6])}</span>
           </div>
+          ${meta ? `<div class="card-actions"><a class="mini-link" href="${escapeHtml(meta.site)}" target="_blank" rel="noreferrer">Website</a><a class="mini-link" href="${escapeHtml(meta.map)}" target="_blank" rel="noreferrer">Map</a></div>` : ""}
+        </article>
+      `;
+    }).join("");
+    document.getElementById("foodList").innerHTML = food.map((item) => {
+      const meta = foodMeta[item[2]];
+      return `
+        <article class="card">
+          <div class="label">${escapeHtml(item[0])} · ${escapeHtml(item[1])}</div>
+          <h3>${escapeHtml(item[2])}</h3>
+          <p>${escapeHtml(item[6])}</p>
+          ${meta ? `<div class="location-note"><b>Location:</b> ${escapeHtml(meta.location)}</div>` : ""}
+          <div class="tag-row">
+            <span class="tag">${escapeHtml(item[3])}</span>
+            <span class="tag">${escapeHtml(item[4])}</span>
+            <span class="tag${item[5].includes("Yes") ? " splurge" : ""}">${escapeHtml(item[5])}</span>
+          </div>
+          ${meta ? `<div class="card-actions"><a class="mini-link" href="${escapeHtml(meta.map)}" target="_blank" rel="noreferrer">Map/Search</a></div>` : ""}
         </article>
       `;
     }).join("");
 
-    document.getElementById("foodList").innerHTML = food.map((item) => `
-      <article class="card">
-        <div class="label">${escapeHtml(item[0])} · ${escapeHtml(item[1])}</div>
-        <h3>${escapeHtml(item[2])}</h3>
-        <p>${escapeHtml(item[6])}</p>
-        <div class="tag-row">
-          <span class="tag">${escapeHtml(item[3])}</span>
-          <span class="tag">${escapeHtml(item[4])}</span>
-          <span class="tag${item[5].includes("Yes") ? " splurge" : ""}">${escapeHtml(item[5])}</span>
-        </div>
-      </article>
-    `).join("");
-
-    document.getElementById("experienceList").innerHTML = experiences.map((item) => `
-      <article class="card">
-        <div class="label">${escapeHtml(item[0])}</div>
-        <h3>${escapeHtml(item[1])}</h3>
-        <p><b>Soft:</b> ${escapeHtml(item[2])}<br><b>Full:</b> ${escapeHtml(item[3])}</p>
-        <div class="tag-row">
-          <span class="tag">${escapeHtml(item[4])}</span>
-          <span class="tag${item[5].includes("Yes") ? " splurge" : ""}">${escapeHtml(item[5])}</span>
-          <span class="tag keep">${escapeHtml(item[6])}</span>
-        </div>
-      </article>
-    `).join("");
-
+    document.getElementById("experienceList").innerHTML = experiences.map((item) => {
+      const meta = experienceMeta[item[1]];
+      return `
+        <article class="card">
+          <div class="label">${escapeHtml(item[0])}</div>
+          <h3>${escapeHtml(item[1])}</h3>
+          <p><b>Soft:</b> ${escapeHtml(item[2])}<br><b>Full:</b> ${escapeHtml(item[3])}</p>
+          ${meta ? `<div class="location-note"><b>Location:</b> ${escapeHtml(meta.location)}</div>` : ""}
+          <div class="tag-row">
+            <span class="tag">${escapeHtml(item[4])}</span>
+            <span class="tag${item[5].includes("Yes") ? " splurge" : ""}">${escapeHtml(item[5])}</span>
+            <span class="tag keep">${escapeHtml(item[6])}</span>
+          </div>
+          ${meta ? `<div class="card-actions"><a class="mini-link" href="${escapeHtml(meta.site)}" target="_blank" rel="noreferrer">Website</a><a class="mini-link" href="${escapeHtml(meta.map)}" target="_blank" rel="noreferrer">Map</a></div>` : ""}
+        </article>
+      `;
+    }).join("");
     document.getElementById("prepList").innerHTML = prepGroups.map((group) => `
       <article class="card checklist-card">
         <div class="checklist-head">
@@ -1149,7 +1364,7 @@
         if (!strip) return;
         const items = getConfirmedForDay(day[0]);
         strip.classList.toggle("visible", items.length > 0);
-        strip.innerHTML = items.length ? `<b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" · ")}` : "";
+        strip.innerHTML = items.length ? `<b>Confirmed:</b> ${items.map((item) => escapeHtml(item[2])).join(" - ")}` : "";
       });
     };
 
@@ -1160,7 +1375,7 @@
       const total = confirmables.length + prepItems.length;
       const done = confirmed.length + prepDone.length;
       const pct = total ? Math.round((done / total) * 100) : 0;
-      document.getElementById("progressText").textContent = `${confirmed.length} confirmed · ${prepDone.length} to do complete`;
+      document.getElementById("progressText").textContent = `${confirmed.length} confirmed - ${prepDone.length} to do complete`;
       document.getElementById("progressFill").style.width = `${pct}%`;
       document.getElementById("confirmedHotelCount").textContent = confirmed.filter((item) => item[1] === "Hotel").length;
       document.getElementById("confirmedActivityCount").textContent = confirmed.filter((item) => item[1] === "Experience").length;
@@ -1211,7 +1426,7 @@
     document.getElementById("linkList").innerHTML = links.map((link) => `
       <a class="link-card" href="${escapeHtml(link[2])}" target="_blank" rel="noreferrer">
         <div><strong>${escapeHtml(link[0])}</strong><span>${escapeHtml(link[1])}</span></div>
-        <div class="arrow" aria-hidden="true">→</div>
+        <div class="arrow" aria-hidden="true">-&gt;</div>
       </a>
     `).join("");
 
